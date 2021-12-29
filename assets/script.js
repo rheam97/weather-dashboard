@@ -54,7 +54,7 @@ function displayWeather() {
     //fetch api with queries using city name and state?
     // if response ok then display repo
 
-function displayforecast()
+function displayforecast() {
   // make elemtns and append to divs of five-container
   //select forecats
   //make for loop
