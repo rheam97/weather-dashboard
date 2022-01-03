@@ -19,10 +19,9 @@ function k2f(K) {
 //global variables
 let history = JSON.parse(localStorage.getItem("cities") || [])
 // allow page to persist
-var historyBtn =
 
 // api keys
-const apikey = fbce9e166f000ebb199687079f74a400;
+const apikey = "fbce9e166f000ebb199687079f74a400"
 
 //look at one call 
 // get number and take number and add it to link that you construct
@@ -39,26 +38,13 @@ function formSubmitHandler() {
             if (response.ok) {
                 response.json().then(function (data) {
                     displayWeather(data)
+                    displayForecast(data.lat, data.lon)
                 })
             }
             else {
                 alert("Error: City not found.")
             }
-            // use lat and lon to get onecall and forecast
-            // get UVI // display elements separately
-            let lat =
-                let lon =
-                    let uvURL = `` + lat + lon + `&appid=` + apikey
-            // get 5-day forecsat
-            let forecastURL = `` + `&appid=` + apikey
-            fetch(forecastURL).then(function (response) {
-                console.log(response)
-                if (response.ok) {
-                    response.json().then(function (data) {
-                        displayforecast(data)
-                    })
-                }
-            })
+                    
         })
             .catch(function (error) {
                 alert("Unable to connect to OpenWeather.")
@@ -75,7 +61,25 @@ function formSubmitHandler() {
         alert("You must input a city location to retrieve results.")
     }
 }
-
+function displayforecast(lat, lon) {
+    // use lat and lon to get onecall and forecast
+    // create the fetch url in here using lat and lon from the other function
+     // make elemtns and append to divs of five-container
+    //select forecats
+    //make for loop
+    //0-4 of array
+    let uvURL = `` + lat + lon + `&appid=` + apikey
+            // get 5-day forecsat with onecall
+            let forecastURL = `` + `&appid=` + apikey
+            fetch(forecastURL).then(function (response) {
+                console.log(response)
+                if (response.ok) {
+                    response.json().then(function (data) {
+                        displayforecast(data)
+                    })
+                }
+            })
+}
 
 // form submit function
 //pass in fetch function for queries for location name, date, weather icon, temp, wind, humidity, uv
@@ -89,6 +93,7 @@ function formSubmitHandler() {
 // display content function
 // innerhtml icon conditions
 function displayWeather(data) {
+// do all the current conditions stuff
 
 }
 // fetch top container
@@ -102,19 +107,9 @@ function displayWeather(data) {
 // search history button add event listener for two functions?
 //appendchild to hsitory container
 
-function displayforecast(data) {
-    // make elemtns and append to divs of five-container
-    //select forecats
-    //make for loop
-    //0-4 of array
-}
-//fetch five day forecast 
-// same thing as first fetch
-// if response ok then display repo
-
 function showHistory() {
     for (let i = 0; i < history.length; i++) {
-        historyBtn = document.createElement("button")
+        let historyBtn = document.createElement("button")
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
             formSubmitHandler(historyBtn.textContent)
