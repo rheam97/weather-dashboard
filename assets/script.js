@@ -17,18 +17,18 @@ function k2f(K) {
 }
 
 //global variables
-//let history = JSON.parse(localStorage.getItem("cities")) || []
-// returning error, maybe make it not global 
+let history = JSON.parse(localStorage.getItem("cities")) || []
+// ****returning error, maybe make it not global 
 // allow page to persist
-
-// api keys
-//const apikey ="7a6b3354e50774f952a848fe125c2899"
+// api key
 const apikey = "fbce9e166f000ebb199687079f74a400"
 
-//look at one call 
-// get number and take number and add it to link that you construct
-// current 
-
+// form submit function
+//pass in fetch function for queries for location name, date, weather icon, temp, wind, humidity, uv
+// pass in function for five day forecast with same data points
+//save to local storage 
+//display function for both? or two separate ones? does it depend on the parameter?
+// pass in function for dynamically creating search history buttons
 function formSubmitHandler(event) {
     event.preventDefault()
     //declare input, val, trim
@@ -44,7 +44,7 @@ function formSubmitHandler(event) {
                 response.json().then((data) => {
                     console.log(data)
                     displayWeather(data)
-                    displayForecast(data.coord.lat, data.coord.lon)
+                    displayForecast(data)
                 })
             }
             else {
@@ -57,7 +57,6 @@ function formSubmitHandler(event) {
             })
         // set local storage variable
         const cityPast = cityInputEl.value
-        let history = JSON.parse(localStorage.getItem("cities")) || []
         if (!history.includes(cityPast)) {
             //push it into history array
             history.push(cityPast)
@@ -68,13 +67,12 @@ function formSubmitHandler(event) {
         }
 
     }
-    else { // edge case
+    else { // edge case for no input
         alert("You must input a city location to retrieve results.")
     }
 }
 
-// display content function
-// innerhtml icon conditions
+// display jumbo content function
 function displayWeather(data) {
     // do all the current conditions stuff
     let date = new Date(data.dt * 1000)
@@ -82,64 +80,66 @@ function displayWeather(data) {
     let month = date.getMonth() + 1
     let year = date.getFullYear()
     let weatherPic = document.createElement('img')
+    // innerhtml icon conditions
     weatherPic.setAttribute("src", `https://openweathermap.org/img/w/${data.weather[0].icon}.png`)
     weatherPic.setAttribute("alt", data.weather[0].description)
     weatherCityHeaderEl.textContent = `${cityInputEl.value} ${month}/${day}/${year} ${weatherPic}`
-    temperatureEl.textContent= `Temperature: ${k2f(data.main.temp)}°F`
-    wsEl.textContent= `Wind Speed: ${data.wind.speed} MPH`
-    humidityEl.textContent= `Humidity: ${data.main.humidity}%`
-
-    let lat = data.coord.lat
-    let lon = data.coord.lon
-    // display UVI
-    let uvURL= 
+    temperatureEl.textContent = `Temperature: ${k2f(data.main.temp)}°F`
+    wsEl.textContent = `Wind Speed: ${data.wind.speed} MPH`
+    humidityEl.textContent = `Humidity: ${data.main.humidity}%`
 
 }
-// function displayForecast(lat, lon) {
-//     // use lat and lon to get onecall and forecast
-//     // create the fetch url in here using lat and lon from the other function
-//     // make elemtns and append to divs of five-container
-//     //select forecats
-//     //make for loop
-//     //0-4 of array
-//     let uvURL = `` + lat + lon + `&appid=` + apikey
-//     // get 5-day forecsat with onecall
-//     let forecastURL = `&appid=${apikey}`
-//     fetch(forecastURL).then(function (response) {
-//         console.log(response)
-//         if (response.ok) {
-//             response.json().then(function (data) {
-//                 displayForecast(data)
-//             })
-//         }
-//     })
-// }
+// display UVI and forecast
+function displayForecast(data) {
+    let lat = data.coord.lat
+    let lon = data.coord.lon
+    // use lat and lon to get uvi and forecast data
+    let uviforecastURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${apikey}`
+    fetch(uviforecastURL).then((response) => {
+        if (response.ok) {
+            response.json().then((data) => {
+                let uvi = document.createElement("span")
+                uvEl.append(uvi)
+                uvEl.textContent = `UV Index: `
+                uvi.textContent = parseInt(data.current.uvi)
+                if (uvi < 3) {
+                    uvEl.setAttribute("class", "success")
+                }
+                else if (3 < uvi < 9) {
+                    uvEl.setAttribute("class", "warning")
+                }
 
-// form submit function
-//pass in fetch function for queries for location name, date, weather icon, temp, wind, humidity, uv
-// pass in function for five day forecast with same data points
-//save to local storage 
-//display function for both? or two separate ones? does it depend on the parameter?
-// pass in function for dynamically creating search history buttons
+                else {
+                    uvEl.setAttribute("class", "danger")
+                }
+
+                
+            })
+        }
+    })
+    // make elemtns and append to divs of five-container
+    //select forecats
+    //make for loop
+    //0-4 of array
+
+    // get 5-day forecsat with onecall
+    //     let forecastURL = `&appid=${apikey}`
+    //     fetch(forecastURL).then(function (response) {
+    //         console.log(response)
+    //         if (response.ok) {
+    //             response.json().then(function (data) {
+    //                 displayForecast(data)
+    //             })
+    //         }
+    //     })
+}
+
+
 //use for loop to create elements
-
-
-
-// fetch top container
-//fetch api with queries using city name and state?
-// if response ok then display repo
-//define history
-// for loop
-//get item
-// define history btn
-//make search history button
-// search history button add event listener for two functions?
-//appendchild to hsitory container
-
 function showHistory(history) {
     for (let i = 0; i < history.length; i++) {
         let historyBtn = document.createElement("button")
-        historyBtn.setAttribute("class", "w-80")
+        historyBtn.setAttribute("class", "btn-secondary w-80")
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
             formSubmitHandler(historyBtn.textContent)
