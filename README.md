@@ -20,3 +20,8 @@ html
 //uv index has icon to show whether or not its favorable: 3 conditions
 // container below to show 5 day forecast of that city with alll of the same aspects as 
 //third container
+
+
+
+
+

@@ -1,7 +1,7 @@
 //DOM references
 let cityInputEl = document.getElementById("city-name")
-let searchBtnEl = document.querySelector("search")
-let clearBtnEl = document.querySelector("clear")
+let searchBtnEl = document.querySelector(".search")
+let clearBtnEl = document.querySelector(".clear")
 let historyContEl = document.getElementById("history-buttons")
 let weatherDisplayEl = document.getElementById("main-container")
 let weatherCityHeaderEl = document.getElementById("city-today")
@@ -17,7 +17,7 @@ function k2f(K) {
 }
 
 //global variables
-let history = JSON.parse(localStorage.getItem("cities") || [])
+//let history = JSON.parse(localStorage.getItem("cities") || [])
 // allow page to persist
 
 // api keys
@@ -30,15 +30,15 @@ const apikey = "fbce9e166f000ebb199687079f74a400"
 function formSubmitHandler() {
     //declare input, val, trim
     let cityname = cityInputEl.value().trim()
-    if (cityname) {
+    if (cityname)
         // use current to get lat and lon
-        let weatherURL = `` + cityname + `&appid=` + apikey
+        let weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=${apikey}`
         fetch(weatherURL).then(function (response) {
             console.log(response)
             if (response.ok) {
                 response.json().then(function (data) {
                     displayWeather(data)
-                    displayForecast(data.lat, data.lon)
+                    displayForecast(data.coord.lat, data.coord.lon)
                 })
             }
             else {
@@ -50,7 +50,7 @@ function formSubmitHandler() {
                 alert("Unable to connect to OpenWeather.")
             })
         // set local storage variable
-        const cityPast = cityInputEl.value()
+        const cityPast = cityInputEl.value
         //push it into history array
         history.push(cityPast)
         //set items with key value and stringify history array
@@ -61,7 +61,7 @@ function formSubmitHandler() {
         alert("You must input a city location to retrieve results.")
     }
 }
-function displayforecast(lat, lon) {
+function displayForecast(lat, lon) {
     // use lat and lon to get onecall and forecast
     // create the fetch url in here using lat and lon from the other function
      // make elemtns and append to divs of five-container
@@ -70,12 +70,12 @@ function displayforecast(lat, lon) {
     //0-4 of array
     let uvURL = `` + lat + lon + `&appid=` + apikey
             // get 5-day forecsat with onecall
-            let forecastURL = `` + `&appid=` + apikey
+            let forecastURL = `&appid=${apikey}`
             fetch(forecastURL).then(function (response) {
                 console.log(response)
                 if (response.ok) {
                     response.json().then(function (data) {
-                        displayforecast(data)
+                        displayForecast(data)
                     })
                 }
             })
@@ -94,6 +94,11 @@ function displayforecast(lat, lon) {
 // innerhtml icon conditions
 function displayWeather(data) {
 // do all the current conditions stuff
+let currentDate = new Date(data.dt *1000)
+let day = currentDate.getDay()
+let month = currentDate.getMonth()
+let year = currentDate.getFullYear()
+weatherCityHeaderEl.textContent = `${cityInputEl.value} ${month}/${day}/${year} ${data.weather.icon}`
 
 }
 // fetch top container
