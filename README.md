@@ -10,7 +10,7 @@
 
 A weather dashboard that will run in the browser and feature dynamically updated HTML and CSS (made with Bootstrap) using vanilla JS.
 
-Uses the ![OpenWeather One Call API](https://openweathermap.org/api/one-call-api) to retrieve weather data for cities. Uses localStorage to store any persistent data.
+Uses the [OpenWeather One Call API](https://openweathermap.org/api/one-call-api) to retrieve weather data for cities. Uses localStorage to store any persistent data.
 
 
 ### Acceptance Criteria
