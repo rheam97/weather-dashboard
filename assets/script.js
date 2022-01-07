@@ -97,7 +97,7 @@ function getWeather(city) {
 }
 // display jumbo content function
 function displayWeather(data) {
-    // make the elemtns with current api data
+    // make the elements with current api data
     let date = new Date(data.dt * 1000)
     let day = date.getDate()
     let month = date.getMonth() + 1
