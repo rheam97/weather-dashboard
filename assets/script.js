@@ -70,7 +70,7 @@ function formSubmitHandler(cityname) {
                                 if (parseInt(uvindex.textContent) < 3) {
                                     uvindex.setAttribute("class", "badge badge-success")
                                 }
-                                else if (3 < parseInt(uvi.textContent) < 9) {
+                                else if (3 < parseInt(uvindex.textContent) < 9) {
                                     uvindex.setAttribute("class", "badge badge-warning")
                                 }
                             
