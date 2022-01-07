@@ -50,8 +50,8 @@ note: if the timezone is 3 hours behind, the forecast will begin with what looks
 <a name="URL"></a>
 ## URL
 
-* The URL of the deployed application: 
-* The URL of the repo: 
+* The URL of the deployed application: https://rheam97.github.io/weather-dashboard/
+* The URL of the repo: https://github.com/rheam97/weather-dashboard.git
 
 
 
