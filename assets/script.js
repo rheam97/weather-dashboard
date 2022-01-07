@@ -43,10 +43,11 @@ const apikey = "fbce9e166f000ebb199687079f74a400"
 //save to local storage 
 //display function for both? or two separate ones? does it depend on the parameter?
 // pass in function for dynamically creating search history buttons
-let cityname = cityInputEl.value.trim()
-function formSubmitHandler(cityname) {
+
+function formSubmitHandler(variable) {
     //event.preventDefault()
     //declare input, val, trim
+    let cityname = cityInputEl.value.trim()
     if (cityname) {
         // use current to get lat and lon
         let weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=${apikey}`
@@ -118,8 +119,9 @@ function displayWeather(data) {
     let month = date.getMonth() + 1
     let year = date.getFullYear()
     let weatherPic = document.createElement('img')
+    let weatherPicFetch = data.weather[0].icon
     // innerhtml icon conditions
-    weatherPic.setAttribute("src", `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`)
+    weatherPic.setAttribute("src", `https://openweathermap.org/img/wn/${weatherPicFetch}@2x.png`)
     weatherPic.setAttribute("alt", data.weather[0].description)
     weatherCityHeaderEl.textContent = `${data.name} ${month}/${day}/${year} ${weatherPic}`
     temperatureEl.textContent = `Temperature: ${k2f(data.main.temp)}°F`
