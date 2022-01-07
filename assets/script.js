@@ -1,3 +1,14 @@
+//current issues:
+// not pulling up uvi
+// not displaying main icon
+// not displaying forecast dates properly
+//forecast divs are wobbly
+// not repopulating history properly
+// search history buttons dont work with forumsubmithandler
+// clear contents of container for new search and old search
+
+
+
 //DOM references
 let cityInputEl = document.getElementById("city-name")
 let searchBtnEl = document.querySelector(".search")
@@ -18,6 +29,7 @@ function k2f(K) {
 
 //global variables
 let history = JSON.parse(localStorage.getItem("cities")) || []
+//document.onload(history)
 // ****returning error, maybe make it not global 
 // allow page to persist
 // api key
@@ -34,17 +46,39 @@ function formSubmitHandler(event) {
     //declare input, val, trim
     let cityname = cityInputEl.value.trim()
     if (cityname) {
-        // not fetching anything
         // use current to get lat and lon
         let weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=${apikey}`
         fetch(weatherURL).then((response) => {
-            // why isnt it console.logging?**?
             console.log(response)
             if (response.ok) {
                 response.json().then((data) => {
-                    console.log(data)
                     displayWeather(data)
-                    displayForecast(data)
+                    let lat = data.coord.lat
+                    let lon = data.coord.lon
+                    // use lat and lon to get uvi and forecast data
+                    let uviforecastURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${apikey}&cnt=1`
+                    fetch(uviforecastURL).then((response) => {
+                        console.log(response)
+                        if (response.ok) {
+                            response.json().then((data2) => {
+                                let uvindex = document.createElement("span")
+                                uvEl.append(uvindex)
+                                uvEl.textContent = `UV Index: `
+                                uvindex.textContent = `${data2.current.uvi}`
+                                if (parseInt(uvindex.textContent) < 3) {
+                                    uvindex.setAttribute("class", "badge badge-success")
+                                }
+                                else if (3 < parseInt(uvi.textContent) < 9) {
+                                    uvindex.setAttribute("class", "badge badge-warning")
+                                }
+                            
+                                else {
+                                    uvindex.setAttribute("class", "badge badge-danger")
+                                }
+                                displayForecast(data2)
+                            })
+                        }
+                    })
                 })
             }
             else {
@@ -65,11 +99,16 @@ function formSubmitHandler(event) {
             localStorage.setItem("cities", JSON.stringify(history))
             showHistory(history)
         }
+        else if (history.includes(cityPast)) {
+            showHistory(history)
+        }
 
     }
     else { // edge case for no input
         alert("You must input a city location to retrieve results.")
     }
+    // clear contents of container
+    cityInputEl.value = ""
 }
 
 // display jumbo content function
@@ -81,9 +120,9 @@ function displayWeather(data) {
     let year = date.getFullYear()
     let weatherPic = document.createElement('img')
     // innerhtml icon conditions
-    weatherPic.setAttribute("src", `https://openweathermap.org/img/w/${data.weather[0].icon}.png`)
+    weatherPic.setAttribute("src", `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`)
     weatherPic.setAttribute("alt", data.weather[0].description)
-    weatherCityHeaderEl.textContent = `${cityInputEl.value} ${month}/${day}/${year} ${weatherPic}`
+    weatherCityHeaderEl.textContent = `${data.name} ${month}/${day}/${year} ${weatherPic}`
     temperatureEl.textContent = `Temperature: ${k2f(data.main.temp)}°F`
     wsEl.textContent = `Wind Speed: ${data.wind.speed} MPH`
     humidityEl.textContent = `Humidity: ${data.main.humidity}%`
@@ -91,32 +130,42 @@ function displayWeather(data) {
 }
 // display UVI and forecast
 function displayForecast(data) {
-    let lat = data.coord.lat
-    let lon = data.coord.lon
-    // use lat and lon to get uvi and forecast data
-    let uviforecastURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${apikey}`
-    fetch(uviforecastURL).then((response) => {
-        if (response.ok) {
-            response.json().then((data) => {
-                let uvi = document.createElement("span")
-                uvEl.append(uvi)
-                uvEl.textContent = `UV Index: `
-                uvi.textContent = parseInt(data.current.uvi)
-                if (uvi < 3) {
-                    uvEl.setAttribute("class", "success")
-                }
-                else if (3 < uvi < 9) {
-                    uvEl.setAttribute("class", "warning")
-                }
+    fiveDayEl.classList.remove("d-none")
+    let forecastEls = document.querySelectorAll(".forecast")
+    for (let i = 0; i < forecastEls.length; i++) {
+        let forecastheaders = document.createElement("p")
+        let forecastIcon = document.createElement("img")
+        let forecastTemp = document.createElement("p")
+        let forecastWind = document.createElement("p")
+        let forecastHum = document.createElement("p")
+        //for (let l = 0; l < forecastEls[i].length; l++) {
+            let forecastDate = new Date(data.daily[i].dt * 1000)
+            let forecastDays = forecastDate.getDay()
+            let forecastMonth = forecastDate.getMonth()
+            let forecastYear = forecastDate.getFullYear()
+           
+            forecastheaders.textContent = `${forecastMonth}/${forecastDays}/${forecastYear}`
+           
+            let forecastPic = data.daily[i].weather[0].icon
+            forecastIcon.setAttribute("src", `https://openweathermap.org/img/wn/${forecastPic}@2x.png`)
+            forecastIcon.setAttribute("alt", data.daily[i].weather[0].description)
+            
+            forecastTemp.textContent= `Temp: ${k2f(data.daily[i].temp.day)}°F`
+           
+            forecastWind.textContent = `Wind: ${data.daily[i].wind_speed} MPH`
+           
+            forecastHum.textContent= `Humidity: ${data.daily[i].humidity}%`
+            forecastEls[i].appendChild(forecastheaders)
+            forecastEls[i].appendChild(forecastIcon)
+            forecastEls[i].appendChild(forecastTemp)
+            forecastEls[i].appendChild(forecastWind)
+            forecastEls[i].appendChild(forecastHum)
+       // }
+    }
 
-                else {
-                    uvEl.setAttribute("class", "danger")
-                }
-
-                
-            })
-        }
-    })
+    // })
+    //  }
+    //  })
     // make elemtns and append to divs of five-container
     //select forecats
     //make for loop
@@ -142,7 +191,8 @@ function showHistory(history) {
         historyBtn.setAttribute("class", "btn-secondary w-80")
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
-            formSubmitHandler(historyBtn.textContent)
+            //// ****doesn't work
+
         })
         historyContEl.appendChild(historyBtn)
     }
