@@ -1,6 +1,4 @@
 //current issues:
-// not pulling up uvi
-// giving input edge case when input is input
 // not repopulating history properly when cleared, giving console error for history.length when ls is empty
 // not getting and setting properly
 // where to put clear contents(especially for forecast display)
@@ -142,8 +140,8 @@ function displayWeather(data) {
 function displayForecast(data2) {
     fiveDayEl.classList.remove("d-none")
     let forecastEls = document.querySelectorAll(".forecast")
-    // forecastEls.innerHTML=""
     for (let i = 0; i < forecastEls.length; i++) {
+        forecastEls[i].innerHTML=""
         let forecastheaders = document.createElement("p")
         let forecastIcon = document.createElement("img")
         let forecastTemp = document.createElement("p")
@@ -182,20 +180,18 @@ function showHistory(history) {
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
             getWeather(historyBtn.textContent)
-            // clear contents of container*** not working 
-            cityInputEl.value = ""
         })
         historyContEl.appendChild(historyBtn)
     }
 }
 
 function clearHistory() {
-    // clear local storage
-    localStorage.clear()
-    //render onto page
-    history = []
-    showHistory(history)
-}
+    //clear local storage
+ localStorage.clear()
+ //render onto page
+history = []
+ showHistory(history)
+ }
 
 // search button add event listener
 // form submit function launch
