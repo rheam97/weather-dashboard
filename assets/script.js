@@ -44,8 +44,8 @@ const apikey = "fbce9e166f000ebb199687079f74a400"
 //display function for both? or two separate ones? does it depend on the parameter?
 // pass in function for dynamically creating search history buttons
 
-function formSubmitHandler(variable) {
-    //event.preventDefault()
+function formSubmitHandler(event) {
+    event.preventDefault()
     //declare input, val, trim
     let cityname = cityInputEl.value.trim()
     if (cityname) {
@@ -90,9 +90,11 @@ function formSubmitHandler(variable) {
 
         })
             .catch(function (error) {
+                console.log(error)
                 alert("Unable to connect to OpenWeather.")
             })
         // set local storage variable
+        // perhaps put this into show history and just call it from here 
         const cityPast = cityInputEl.value
         if (!history.includes(cityPast)) {
             //push it into history array
