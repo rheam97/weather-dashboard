@@ -3,9 +3,11 @@
 // not displaying main icon
 // not displaying forecast dates properly
 //forecast divs are wobbly
-// not repopulating history properly
-// search history buttons dont work with forumsubmithandler
-// clear contents of container for new search and old search
+// not repopulating history properly when cleared
+// not getting and setting properly
+// where to put clear contents
+// search history buttons dont work with forumsubmithandler because of preventdefault
+
 
 
 
@@ -41,10 +43,10 @@ const apikey = "fbce9e166f000ebb199687079f74a400"
 //save to local storage 
 //display function for both? or two separate ones? does it depend on the parameter?
 // pass in function for dynamically creating search history buttons
-function formSubmitHandler(event) {
-    event.preventDefault()
+let cityname = cityInputEl.value.trim()
+function formSubmitHandler(cityname) {
+    //event.preventDefault()
     //declare input, val, trim
-    let cityname = cityInputEl.value.trim()
     if (cityname) {
         // use current to get lat and lon
         let weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=${apikey}`
@@ -97,18 +99,15 @@ function formSubmitHandler(event) {
             //set items with key value and stringify history array
             // figure out why its repopulating ****
             localStorage.setItem("cities", JSON.stringify(history))
-            showHistory(history)
-        }
-        else if (history.includes(cityPast)) {
-            showHistory(history)
+            showHistory()
         }
 
     }
     else { // edge case for no input
         alert("You must input a city location to retrieve results.")
     }
-    // clear contents of container
-    cityInputEl.value = ""
+     // clear contents of container
+     cityInputEl.value = ""
 }
 
 // display jumbo content function
@@ -191,7 +190,9 @@ function showHistory(history) {
         historyBtn.setAttribute("class", "btn-secondary w-80")
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
-            //// ****doesn't work
+            //// ****doesn't work because of prevent default
+            formSubmitHandler(historyBtn.textContent)
+           
 
         })
         historyContEl.appendChild(historyBtn)
@@ -212,6 +213,8 @@ searchBtnEl.addEventListener("click", formSubmitHandler)
 // clear history button clear function
 clearBtnEl.addEventListener("click", clearHistory)
 
+// get search history to persist on refresh
+showHistory(history)
 
 
 
