@@ -1,11 +1,9 @@
 //current issues:
 // not pulling up uvi
 // giving input edge case when input is input
-// not repopulating history properly when cleared
+// not repopulating history properly when cleared, giving console error for history.length when ls is empty
 // not getting and setting properly
 // where to put clear contents(especially for forecast display)
-
-
 
 
 
@@ -189,7 +187,7 @@ function clearHistory() {
     localStorage.clear()
     //render onto page
     history = []
-    showHistory(localStorage)
+    showHistory(history)
 }
 
 // search button add event listener
