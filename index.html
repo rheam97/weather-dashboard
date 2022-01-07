@@ -26,22 +26,24 @@
                     <button type="submit" class="search btn-primary mt-2 w-100">Search</button>
                 </form>
                 <h3 class="card-header">Search History</h3>
-                <button type="button" class="clear btn-primary mt-2 w-">Clear</button>
+                <button type="button" class="clear btn-primary m-3">Clear</button>
                 <div class="card-body" id="history-buttons">
                 </div>
             </div>
         </div>
         <div class="col-8 column mt-3">
-            <div id="main-container" class="weather-now border row mr-2">
+            <div id="main-container" class="weather-now border row mr-2 align-items-center">
                 <h2 id="city-today"></h2>
-                <p id="temperature"></p>
-                <p id="humidity"></p>
-                <p id="windspeed"></p>
-                <p id="uv-index"></p>
+                <div class ="column">
+                    <p id="temperature"></p>
+                    <p id="humidity"></p>
+                    <p id="windspeed"></p>
+                    <p id="uv-index"></p>
+                </div>
             </div>
             <div  id="five-container" class="d-none">
             <h4 class="row">5-Day Forecast:</h4>
-                <div class="row weather-future w-100 p-2">
+                <div class="d-flex justify-content-between row weather-future w-100 p-2">
                     <div class="card forecast"></div>
                     <div class="card forecast"></div>
                     <div class="card forecast"></div>
