@@ -1,10 +1,3 @@
-//current issues:
-// not repopulating history properly when cleared, giving console error for history.length when ls is empty
-// not getting and setting properly
-// where to put clear contents(especially for forecast display)
-
-
-
 //DOM references
 let cityInputEl = document.getElementById("city-name")
 let searchBtnEl = document.querySelector(".search")
@@ -25,38 +18,31 @@ function k2f(K) {
 
 //global variables
 let history = JSON.parse(localStorage.getItem("cities")) || []
-//document.onload(history)
-// ****returning error, maybe make it not global 
-// allow page to persist
-// api key
 const apikey = "fbce9e166f000ebb199687079f74a400"
-
-
 
 function formSubmitHandler(event) {
     event.preventDefault()
-    //declare input, val, trim
+    //declare input, value, trim
     let cityname = cityInputEl.value.trim()
     if (cityname) {
         // use current to get lat and lon
         getWeather(cityname)
-        // set local storage variable
-        // perhaps put this into show history and just call it from here 
 
+        // so that cityname is not repeated in search history 
         if (!history.includes(cityname)) {
             //push it into history array
             history.push(cityname)
             //set items with key value and stringify history array
-
             localStorage.setItem("cities", JSON.stringify(history))
-             // figure out why its not repopulating **** and why it gives console error for length when ls
-             //is cleared
-             showHistory(history)
-            
+            showHistory(history)
+
         }
-        showHistory(history)
+        else {
+            showHistory(history)
+        }
+
     }
-    else { // edge case for no input why does this pop up when i input??****
+    else { // edge case for no input
         alert("You must input a city location to retrieve results.")
     }
 
@@ -77,9 +63,9 @@ function getWeather(city) {
                     console.log(response2)
                     if (response2.ok) {
                         response2.json().then((data2) => {
-        
+
                             let uvindex = document.createElement("span")
-        
+
                             uvEl.textContent = `UV Index: `
                             uvEl.appendChild(uvindex)
                             uvindex.textContent = data2.current.uvi
@@ -99,11 +85,11 @@ function getWeather(city) {
                 })
             })
         }
-        else {
+        else { // typo error
             alert("Error: City not found.")
         }
 
-    })
+    })// network error
         .catch(function (error) {
             console.log(error)
             alert("Unable to connect to OpenWeather.")
@@ -111,12 +97,7 @@ function getWeather(city) {
 }
 // display jumbo content function
 function displayWeather(data) {
-    // let weatherCityHeaderEl.textContent= ""
-    // let weatherPic= ""
-    // let temperatureEl.textContent=""
-    // let wsEl.textContent = ""
-    // let humidityEl.textContent = ""
-    // do all the current conditions stuff
+    // make the elemtns with current api data
     let date = new Date(data.dt * 1000)
     let day = date.getDate()
     let month = date.getMonth() + 1
@@ -133,21 +114,21 @@ function displayWeather(data) {
     humidityEl.textContent = `Humidity: ${data.main.humidity}%`
 }
 
-// make elemtns and append to divs of five-container
-//select forecats
+
+//select forecast cards
 //make for loop
-//0-4 of array
 function displayForecast(data2) {
     fiveDayEl.classList.remove("d-none")
     let forecastEls = document.querySelectorAll(".forecast")
     for (let i = 0; i < forecastEls.length; i++) {
-        forecastEls[i].innerHTML=""
+        forecastEls[i].innerHTML = ""
+        // make and append elements to forecast cards
         let forecastheaders = document.createElement("p")
         let forecastIcon = document.createElement("img")
         let forecastTemp = document.createElement("p")
         let forecastWind = document.createElement("p")
         let forecastHum = document.createElement("p")
-
+        //iterate through 1-5 of data.daily array in onecall to get next day onwards
         let forecastDate = new Date(data2.daily[i + 1].dt * 1000)
         let forecastDays = forecastDate.getDate()
         let forecastMonth = forecastDate.getMonth() + 1
@@ -174,6 +155,7 @@ function displayForecast(data2) {
 
 //use for loop to create elements
 function showHistory(history) {
+    historyContEl.innerHTML = ""
     for (let i = 0; i < history.length; i++) {
         let historyBtn = document.createElement("button")
         historyBtn.setAttribute("class", "btn btn-success mb-1 w-100")
@@ -187,11 +169,11 @@ function showHistory(history) {
 
 function clearHistory() {
     //clear local storage
- localStorage.clear()
- //render onto page
-history = []
- showHistory(history)
- }
+    localStorage.clear()
+    //render onto page
+    history = []
+    showHistory(history)
+}
 
 // search button add event listener
 // form submit function launch
