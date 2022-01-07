@@ -1,11 +1,9 @@
 //current issues:
-// not pulling up header
 // not pulling up uvi
-// not displaying main icon
-//forecast divs are wobbly
+// giving input edge case when input is input
 // not repopulating history properly when cleared
 // not getting and setting properly
-// where to put clear contents
+// where to put clear contents(especially for forecast display)
 
 
 
@@ -37,12 +35,7 @@ let history = JSON.parse(localStorage.getItem("cities")) || []
 // api key
 const apikey = "fbce9e166f000ebb199687079f74a400"
 
-// form submit function
-//pass in fetch function for queries for location name, date, weather icon, temp, wind, humidity, uv
-// pass in function for five day forecast with same data points
-//save to local storage 
-//display function for both? or two separate ones? does it depend on the parameter?
-// pass in function for dynamically creating search history buttons
+
 
 function formSubmitHandler(event) {
     event.preventDefault()
@@ -53,20 +46,21 @@ function formSubmitHandler(event) {
         getWeather(cityname)
         // set local storage variable
         // perhaps put this into show history and just call it from here 
-        
+
         if (!history.includes(cityname)) {
             //push it into history array
             history.push(cityname)
             //set items with key value and stringify history array
-            // figure out why its repopulating ****
+
             localStorage.setItem("cities", JSON.stringify(history))
-            showHistory()
+             // figure out why its not repopulating **** and why it gives console error for length when ls
+             //is cleared
+             showHistory()
+            
         }
-        // clear contents of container
-        cityInputEl.value = ""
-        console.log(cityInputEl.value)
+        showHistory()
     }
-    else { // edge case for no input
+    else { // edge case for no input why does this pop up when i input??****
         alert("You must input a city location to retrieve results.")
     }
 
@@ -88,7 +82,7 @@ function getWeather(city) {
                     if (response2.ok) {
                         response2.json().then((data2) => {
                             let uvindex = document.createElement("span")
-                            uvEl.append(uvindex)
+                            uvEl.appendChild(uvindex)
                             uvEl.textContent = `UV Index: `
                             uvindex.textContent = `${data2.current.uvi}`
                             if (parseInt(uvindex.textContent) < 3) {
@@ -125,17 +119,16 @@ function displayWeather(data) {
     let day = date.getDate()
     let month = date.getMonth() + 1
     let year = date.getFullYear()
-    let weatherPic = document.createElement('image')
+    let weatherPic = document.createElement("img")
     let weatherPicFetch = data.weather[0].icon
     // innerhtml icon conditions
     weatherPic.setAttribute("src", `https://openweathermap.org/img/wn/${weatherPicFetch}@2x.png`)
     weatherPic.setAttribute("alt", data.weather[0].description)
+    weatherCityHeaderEl.textContent = `${data.name} ${month}/${day}/${year}`
     weatherCityHeaderEl.appendChild(weatherPic)
-    weatherCityHeaderEltextContent = `${data.name} ${month}/${day}/${year}`
     temperatureEl.textContent = `Temperature: ${k2f(data.main.temp)}°F`
     wsEl.textContent = `Wind Speed: ${data.wind.speed} MPH`
     humidityEl.textContent = `Humidity: ${data.main.humidity}%`
-
 }
 
 // make elemtns and append to divs of five-container
@@ -152,22 +145,22 @@ function displayForecast(data2) {
         let forecastWind = document.createElement("p")
         let forecastHum = document.createElement("p")
 
-        let forecastDate = new Date(data2.daily[i+1].dt * 1000)
+        let forecastDate = new Date(data2.daily[i + 1].dt * 1000)
         let forecastDays = forecastDate.getDate()
         let forecastMonth = forecastDate.getMonth() + 1
         let forecastYear = forecastDate.getFullYear()
 
         forecastheaders.textContent = `${forecastMonth}/${forecastDays}/${forecastYear}`
 
-        let forecastPic = data2.daily[i+1].weather[0].icon
+        let forecastPic = data2.daily[i + 1].weather[0].icon
         forecastIcon.setAttribute("src", `https://openweathermap.org/img/wn/${forecastPic}@2x.png`)
-        forecastIcon.setAttribute("alt", data2.daily[i+1].weather[0].description)
+        forecastIcon.setAttribute("alt", data2.daily[i + 1].weather[0].description)
 
-        forecastTemp.textContent = `Temp: ${k2f(data2.daily[i+1].temp.day)}°F`
+        forecastTemp.textContent = `Temp: ${k2f(data2.daily[i + 1].temp.day)}°F`
 
-        forecastWind.textContent = `Wind: ${data2.daily[i+1].wind_speed} MPH`
+        forecastWind.textContent = `Wind: ${data2.daily[i + 1].wind_speed} MPH`
 
-        forecastHum.textContent = `Humidity: ${data2.daily[i+1].humidity}%`
+        forecastHum.textContent = `Humidity: ${data2.daily[i + 1].humidity}%`
         forecastEls[i].appendChild(forecastheaders)
         forecastEls[i].appendChild(forecastIcon)
         forecastEls[i].appendChild(forecastTemp)
@@ -180,11 +173,12 @@ function displayForecast(data2) {
 function showHistory(history) {
     for (let i = 0; i < history.length; i++) {
         let historyBtn = document.createElement("button")
-        historyBtn.setAttribute("class", "btn-secondary w-80")
+        historyBtn.classList.add("btn-secondary m-3")
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
-            //// ****doesn't work because of prevent default
             getWeather(historyBtn.textContent)
+            // clear contents of container*** not working 
+            cityInputEl.value = ""
         })
         historyContEl.appendChild(historyBtn)
     }
@@ -195,7 +189,7 @@ function clearHistory() {
     localStorage.clear()
     //render onto page
     history = []
-    showHistory(history)
+    showHistory(localStorage)
 }
 
 // search button add event listener
