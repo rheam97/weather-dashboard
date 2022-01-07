@@ -79,9 +79,11 @@ function getWeather(city) {
                     console.log(response2)
                     if (response2.ok) {
                         response2.json().then((data2) => {
+        
                             let uvindex = document.createElement("span")
-                            uvEl.appendChild(uvindex)
+        
                             uvEl.textContent = `UV Index: `
+                            uvEl.appendChild(uvindex)
                             uvindex.textContent = data2.current.uvi
                             if (parseInt(uvindex.textContent) < 3) {
                                 uvindex.setAttribute("class", "badge badge-success")
@@ -111,13 +113,17 @@ function getWeather(city) {
 }
 // display jumbo content function
 function displayWeather(data) {
-
+    // let weatherCityHeaderEl.textContent= ""
+    // let weatherPic= ""
+    // let temperatureEl.textContent=""
+    // let wsEl.textContent = ""
+    // let humidityEl.textContent = ""
     // do all the current conditions stuff
     let date = new Date(data.dt * 1000)
     let day = date.getDate()
     let month = date.getMonth() + 1
     let year = date.getFullYear()
-    let weatherPic = document.createElement("img")
+    weatherPic = document.createElement("img")
     let weatherPicFetch = data.weather[0].icon
     // innerhtml icon conditions
     weatherPic.setAttribute("src", `https://openweathermap.org/img/wn/${weatherPicFetch}@2x.png`)
@@ -136,6 +142,7 @@ function displayWeather(data) {
 function displayForecast(data2) {
     fiveDayEl.classList.remove("d-none")
     let forecastEls = document.querySelectorAll(".forecast")
+    // forecastEls.innerHTML=""
     for (let i = 0; i < forecastEls.length; i++) {
         let forecastheaders = document.createElement("p")
         let forecastIcon = document.createElement("img")
