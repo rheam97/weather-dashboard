@@ -53,10 +53,10 @@ function formSubmitHandler(event) {
             localStorage.setItem("cities", JSON.stringify(history))
              // figure out why its not repopulating **** and why it gives console error for length when ls
              //is cleared
-             showHistory()
+             showHistory(history)
             
         }
-        showHistory()
+        showHistory(history)
     }
     else { // edge case for no input why does this pop up when i input??****
         alert("You must input a city location to retrieve results.")
@@ -82,7 +82,7 @@ function getWeather(city) {
                             let uvindex = document.createElement("span")
                             uvEl.appendChild(uvindex)
                             uvEl.textContent = `UV Index: `
-                            uvindex.textContent = `${data2.current.uvi}`
+                            uvindex.textContent = data2.current.uvi
                             if (parseInt(uvindex.textContent) < 3) {
                                 uvindex.setAttribute("class", "badge badge-success")
                             }
@@ -171,7 +171,7 @@ function displayForecast(data2) {
 function showHistory(history) {
     for (let i = 0; i < history.length; i++) {
         let historyBtn = document.createElement("button")
-        historyBtn.classList.add("btn-secondary m-3")
+        historyBtn.setAttribute("class", "btn btn-success mb-1 w-100")
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
             getWeather(historyBtn.textContent)
