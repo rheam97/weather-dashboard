@@ -1,12 +1,12 @@
 //current issues:
+// not pulling up header
 // not pulling up uvi
 // not displaying main icon
-// not displaying forecast dates properly
 //forecast divs are wobbly
 // not repopulating history properly when cleared
 // not getting and setting properly
 // where to put clear contents
-// search history buttons dont work with forumsubmithandler because of preventdefault
+
 
 
 
@@ -50,89 +50,99 @@ function formSubmitHandler(event) {
     let cityname = cityInputEl.value.trim()
     if (cityname) {
         // use current to get lat and lon
-        let weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityname}&appid=${apikey}`
-        fetch(weatherURL).then((response) => {
-            console.log(response)
-            if (response.ok) {
-                response.json().then((data) => {
-                    displayWeather(data)
-                    let lat = data.coord.lat
-                    let lon = data.coord.lon
-                    // use lat and lon to get uvi and forecast data
-                    let uviforecastURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${apikey}&cnt=1`
-                    fetch(uviforecastURL).then((response) => {
-                        console.log(response)
-                        if (response.ok) {
-                            response.json().then((data2) => {
-                                let uvindex = document.createElement("span")
-                                uvEl.append(uvindex)
-                                uvEl.textContent = `UV Index: `
-                                uvindex.textContent = `${data2.current.uvi}`
-                                if (parseInt(uvindex.textContent) < 3) {
-                                    uvindex.setAttribute("class", "badge badge-success")
-                                }
-                                else if (3 < parseInt(uvindex.textContent) < 9) {
-                                    uvindex.setAttribute("class", "badge badge-warning")
-                                }
-                            
-                                else {
-                                    uvindex.setAttribute("class", "badge badge-danger")
-                                }
-                                displayForecast(data2)
-                            })
-                        }
-                    })
-                })
-            }
-            else {
-                alert("Error: City not found.")
-            }
-
-        })
-            .catch(function (error) {
-                console.log(error)
-                alert("Unable to connect to OpenWeather.")
-            })
+        getWeather(cityname)
         // set local storage variable
         // perhaps put this into show history and just call it from here 
-        const cityPast = cityInputEl.value
-        if (!history.includes(cityPast)) {
+        
+        if (!history.includes(cityname)) {
             //push it into history array
-            history.push(cityPast)
+            history.push(cityname)
             //set items with key value and stringify history array
             // figure out why its repopulating ****
             localStorage.setItem("cities", JSON.stringify(history))
             showHistory()
         }
-
+        // clear contents of container
+        cityInputEl.value = ""
+        console.log(cityInputEl.value)
     }
     else { // edge case for no input
         alert("You must input a city location to retrieve results.")
     }
-     // clear contents of container
-     cityInputEl.value = ""
+
 }
 
+function getWeather(city) {
+    let weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}`
+    fetch(weatherURL).then((response) => {
+        console.log(response)
+        if (response.ok) {
+            response.json().then((data) => {
+                displayWeather(data)
+                let lat = data.coord.lat
+                let lon = data.coord.lon
+                // use lat and lon to get uvi and forecast data
+                let uviforecastURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${apikey}&cnt=1`
+                fetch(uviforecastURL).then((response2) => {
+                    console.log(response2)
+                    if (response2.ok) {
+                        response2.json().then((data2) => {
+                            let uvindex = document.createElement("span")
+                            uvEl.append(uvindex)
+                            uvEl.textContent = `UV Index: `
+                            uvindex.textContent = `${data2.current.uvi}`
+                            if (parseInt(uvindex.textContent) < 3) {
+                                uvindex.setAttribute("class", "badge badge-success")
+                            }
+                            else if (3 < parseInt(uvindex.textContent) < 9) {
+                                uvindex.setAttribute("class", "badge badge-warning")
+                            }
+
+                            else {
+                                uvindex.setAttribute("class", "badge badge-danger")
+                            }
+                            displayForecast(data2)
+                        })
+                    }
+                })
+            })
+        }
+        else {
+            alert("Error: City not found.")
+        }
+
+    })
+        .catch(function (error) {
+            console.log(error)
+            alert("Unable to connect to OpenWeather.")
+        })
+}
 // display jumbo content function
 function displayWeather(data) {
+
     // do all the current conditions stuff
     let date = new Date(data.dt * 1000)
     let day = date.getDate()
     let month = date.getMonth() + 1
     let year = date.getFullYear()
-    let weatherPic = document.createElement('img')
+    let weatherPic = document.createElement('image')
     let weatherPicFetch = data.weather[0].icon
     // innerhtml icon conditions
     weatherPic.setAttribute("src", `https://openweathermap.org/img/wn/${weatherPicFetch}@2x.png`)
     weatherPic.setAttribute("alt", data.weather[0].description)
-    weatherCityHeaderEl.textContent = `${data.name} ${month}/${day}/${year} ${weatherPic}`
+    weatherCityHeaderEl.appendChild(weatherPic)
+    weatherCityHeaderEltextContent = `${data.name} ${month}/${day}/${year}`
     temperatureEl.textContent = `Temperature: ${k2f(data.main.temp)}°F`
     wsEl.textContent = `Wind Speed: ${data.wind.speed} MPH`
     humidityEl.textContent = `Humidity: ${data.main.humidity}%`
 
 }
-// display UVI and forecast
-function displayForecast(data) {
+
+// make elemtns and append to divs of five-container
+//select forecats
+//make for loop
+//0-4 of array
+function displayForecast(data2) {
     fiveDayEl.classList.remove("d-none")
     let forecastEls = document.querySelectorAll(".forecast")
     for (let i = 0; i < forecastEls.length; i++) {
@@ -141,51 +151,30 @@ function displayForecast(data) {
         let forecastTemp = document.createElement("p")
         let forecastWind = document.createElement("p")
         let forecastHum = document.createElement("p")
-        //for (let l = 0; l < forecastEls[i].length; l++) {
-            let forecastDate = new Date(data.daily[i].dt * 1000)
-            let forecastDays = forecastDate.getDay()
-            let forecastMonth = forecastDate.getMonth()
-            let forecastYear = forecastDate.getFullYear()
-           
-            forecastheaders.textContent = `${forecastMonth}/${forecastDays}/${forecastYear}`
-           
-            let forecastPic = data.daily[i].weather[0].icon
-            forecastIcon.setAttribute("src", `https://openweathermap.org/img/wn/${forecastPic}@2x.png`)
-            forecastIcon.setAttribute("alt", data.daily[i].weather[0].description)
-            
-            forecastTemp.textContent= `Temp: ${k2f(data.daily[i].temp.day)}°F`
-           
-            forecastWind.textContent = `Wind: ${data.daily[i].wind_speed} MPH`
-           
-            forecastHum.textContent= `Humidity: ${data.daily[i].humidity}%`
-            forecastEls[i].appendChild(forecastheaders)
-            forecastEls[i].appendChild(forecastIcon)
-            forecastEls[i].appendChild(forecastTemp)
-            forecastEls[i].appendChild(forecastWind)
-            forecastEls[i].appendChild(forecastHum)
-       // }
+
+        let forecastDate = new Date(data2.daily[i+1].dt * 1000)
+        let forecastDays = forecastDate.getDate()
+        let forecastMonth = forecastDate.getMonth() + 1
+        let forecastYear = forecastDate.getFullYear()
+
+        forecastheaders.textContent = `${forecastMonth}/${forecastDays}/${forecastYear}`
+
+        let forecastPic = data2.daily[i+1].weather[0].icon
+        forecastIcon.setAttribute("src", `https://openweathermap.org/img/wn/${forecastPic}@2x.png`)
+        forecastIcon.setAttribute("alt", data2.daily[i+1].weather[0].description)
+
+        forecastTemp.textContent = `Temp: ${k2f(data2.daily[i+1].temp.day)}°F`
+
+        forecastWind.textContent = `Wind: ${data2.daily[i+1].wind_speed} MPH`
+
+        forecastHum.textContent = `Humidity: ${data2.daily[i+1].humidity}%`
+        forecastEls[i].appendChild(forecastheaders)
+        forecastEls[i].appendChild(forecastIcon)
+        forecastEls[i].appendChild(forecastTemp)
+        forecastEls[i].appendChild(forecastWind)
+        forecastEls[i].appendChild(forecastHum)
     }
-
-    // })
-    //  }
-    //  })
-    // make elemtns and append to divs of five-container
-    //select forecats
-    //make for loop
-    //0-4 of array
-
-    // get 5-day forecsat with onecall
-    //     let forecastURL = `&appid=${apikey}`
-    //     fetch(forecastURL).then(function (response) {
-    //         console.log(response)
-    //         if (response.ok) {
-    //             response.json().then(function (data) {
-    //                 displayForecast(data)
-    //             })
-    //         }
-    //     })
 }
-
 
 //use for loop to create elements
 function showHistory(history) {
@@ -195,9 +184,7 @@ function showHistory(history) {
         historyBtn.textContent = history[i]
         historyBtn.addEventListener("click", function () {
             //// ****doesn't work because of prevent default
-            formSubmitHandler(historyBtn.textContent)
-           
-
+            getWeather(historyBtn.textContent)
         })
         historyContEl.appendChild(historyBtn)
     }
@@ -219,8 +206,3 @@ clearBtnEl.addEventListener("click", clearHistory)
 
 // get search history to persist on refresh
 showHistory(history)
-
-
-
-
-
